@@ -1,0 +1,42 @@
+groups:
+- name: alert.rules
+  rules:
+  - alert: MyHost1Down
+    expr: up{instance="myhost1.example.net:4194"} == 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      impact: 'My Host1 is down '
+      summary: My Host1 Down
+
+
+  - alert: MyHost1tDiskFillIn8Hours
+    expr: predict_linear(node_filesystem_free{name="myhost1",mountpoint="/opt"}[1h], 8*3600) < 0
+    for: 2m 
+    labels:
+      severity: warning
+    annotations:
+      impact: 'Disk is getting full'
+      summary: Clear disk space
+
+
+  - alert: MyHost1MemoryLow
+    expr: node_memory_MemAvailable{name="myhost1"} / node_memory_MemTotal{name="myhost1"} * 100 < 40.0
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      impact: 'Low Memory'
+      summary: Low Memory
+
+
+
+  - alert: MyHost1CPUutilizationHigh
+    expr: 100 - (avg by (name) (irate(node_cpu{name='myhost1', mode="idle"}[10m])) * 100) > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      impact: 'High CPU'
+      summary: High CPU
